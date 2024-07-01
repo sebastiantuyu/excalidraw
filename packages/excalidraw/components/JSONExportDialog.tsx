@@ -4,9 +4,9 @@ import { t } from "../i18n";
 
 import type { ExportOpts, BinaryFiles, UIAppState } from "../types";
 import { Dialog } from "./Dialog";
-import { exportToFileIcon, LinkIcon } from "./icons";
+import { exportToFileIcon, LinkIcon, syncWithProviderIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
-import { actionSaveFileToDisk } from "../actions/actionExport";
+import { actionSaveFileToDisk, actionSyncFileWithProvider } from "../actions/actionExport";
 import { Card } from "./Card";
 
 import "./ExportDialog.scss";
@@ -45,21 +45,21 @@ const JSONExportModal = ({
       <div className="ExportDialog-cards">
         {exportOpts.saveFileToDisk && (
           <Card color="lime">
-            <div className="Card-icon">{exportToFileIcon}</div>
-            <h2>{t("exportDialog.disk_title")}</h2>
+            <div className="Card-icon">{syncWithProviderIcon}</div>
+            <h2>{t("exportDialog.sync_title")}</h2>
             <div className="Card-details">
-              {t("exportDialog.disk_details")}
+              {t("exportDialog.sync_details")}
               {!nativeFileSystemSupported &&
                 actionManager.renderAction("changeProjectName")}
             </div>
             <ToolButton
               className="Card-button"
               type="button"
-              title={t("exportDialog.disk_button")}
-              aria-label={t("exportDialog.disk_button")}
+              title={t("exportDialog.sync_provider")}
+              aria-label={t("exportDialog.sync_provider")}
               showAriaLabel={true}
               onClick={() => {
-                actionManager.executeAction(actionSaveFileToDisk, "ui");
+                actionManager.executeAction(actionSyncFileWithProvider, "ui");
               }}
             />
           </Card>

@@ -20,6 +20,7 @@ import type { Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
 import { StoreAction } from "../store";
+import { syncJSONWithProvider } from "../data/json";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -147,33 +148,89 @@ export const actionSaveToActiveFile = register({
     );
   },
   perform: async (elements, appState, value, app) => {
-    const fileHandleExists = !!appState.fileHandle;
+    // const fileHandleExists = !!appState.fileHandle;
+    // console.log("Save");
+    await syncJSONWithProvider(elements, appState, app.files, app.getName());
 
+    // try {
+    //   const { fileHandle } = isImageFileHandle(appState.fileHandle)
+    //     ? await resaveAsImageWithScene(
+    //         elements,
+    //         appState,
+    //         app.files,
+    //         app.getName(),
+    //       )
+    //     : await saveAsJSON(elements, appState, app.files, app.getName());
+
+    //   return {
+    //     storeAction: StoreAction.NONE,
+    //     appState: {
+    //       ...appState,
+    //       fileHandle,
+    //       toast: fileHandleExists
+    //         ? {
+    //             message: fileHandle?.name
+    //               ? t("toast.fileSavedToFilename").replace(
+    //                   "{filename}",
+    //                   `"${fileHandle.name}"`,
+    //                 )
+    //               : t("toast.fileSaved"),
+    //           }
+    //         : null,
+    //     },
+    //   };
+    // } catch (error: any) {
+    //   if (error?.name !== "AbortError") {
+    //     console.error(error);
+    //   } else {
+    //     console.warn(error);
+    //   }
+    return { storeAction: StoreAction.NONE };
+    // }
+  },
+  keyTest: (event) =>
+    event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
+});
+
+export const actionSyncFileWithProvider = register({
+  name: "syncWithProvider",
+  label: "exportDialog.sync_provider",
+  icon: ExportIcon,
+  viewMode: true,
+  trackEvent: { category: "export" },
+  perform: async (elements, appState, value, app) => {
     try {
-      const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(
-            elements,
-            appState,
-            app.files,
-            app.getName(),
-          )
-        : await saveAsJSON(elements, appState, app.files, app.getName());
+      // const { fileHandle } = await saveAsJSON(
+      //   elements,
+      //   {
+      //     ...appState,
+      //     fileHandle: null,
+      //   },
+      //   app.files,
+      //   app.getName(),
+      // );
+
+      const { data } = await syncJSONWithProvider(
+        elements,
+        {
+          ...appState,
+          fileHandle: null,
+        },
+        app.files,
+        app.getName(),
+      );
+
+      if (data.statusCode !== 200) {
+        throw Error("Error saving the file");
+      }
 
       return {
         storeAction: StoreAction.NONE,
         appState: {
           ...appState,
-          fileHandle,
-          toast: fileHandleExists
-            ? {
-                message: fileHandle?.name
-                  ? t("toast.fileSavedToFilename").replace(
-                      "{filename}",
-                      `"${fileHandle.name}"`,
-                    )
-                  : t("toast.fileSaved"),
-              }
-            : null,
+          openDialog: null,
+          // fileHandle,
+          toast: { message: t("toast.fileSaved") },
         },
       };
     } catch (error: any) {
@@ -186,7 +243,19 @@ export const actionSaveToActiveFile = register({
     }
   },
   keyTest: (event) =>
-    event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
+    event.key === KEYS.S && event.shiftKey && event[KEYS.CTRL_OR_CMD],
+  PanelComponent: ({ updateData }) => (
+    <ToolButton
+      type="button"
+      icon={saveAs}
+      title={t("buttons.saveAs")}
+      aria-label={t("buttons.saveAs")}
+      showAriaLabel={useDevice().editor.isMobile}
+      hidden={!nativeFileSystemSupported}
+      onClick={() => updateData(null)}
+      data-testid="save-as-button"
+    />
+  ),
 });
 
 export const actionSaveFileToDisk = register({
@@ -250,6 +319,7 @@ export const actionLoadScene = register({
     );
   },
   perform: async (elements, appState, _, app) => {
+    console.log("Loading...");
     try {
       const {
         elements: loadedElements,

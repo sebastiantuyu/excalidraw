@@ -7,6 +7,7 @@ import {
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
+import { ApiService } from "../services/api";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
@@ -75,6 +76,15 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
   }) as Promise<RetType>;
 };
 
+export const loadFromProvider = async () => {
+  const {
+    data: { Item },
+  } = await ApiService.axios.get<{
+    Item: { Id: string; Value: string };
+  }>("/draws/7687cc88-83bd-4eb0-91e7-64d4927f9575");
+  return new Blob([Item.Value], { type: "application/json" });
+};
+
 export const fileSave = (
   blob: Blob | Promise<Blob>,
   opts: {
@@ -86,7 +96,7 @@ export const fileSave = (
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
   },
-) => {
+): any => {
   return _fileSave(
     blob,
     {

@@ -1,4 +1,4 @@
-import { fileOpen, fileSave } from "./filesystem";
+import { fileSave, loadFromProvider } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
   DEFAULT_FILENAME,
@@ -18,6 +18,7 @@ import type {
   ExportedLibraryData,
   ImportedLibraryData,
 } from "./types";
+import { ApiService } from "../services/api";
 
 /**
  * Strips out files which are only referenced by deleted elements
@@ -38,6 +39,21 @@ const filterOutDeletedFiles = (
     }
   }
   return nextFiles;
+};
+
+export const syncJSONWithProvider = async (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+  /** filename */
+  name: string = appState.name || DEFAULT_FILENAME,
+) => {
+  const serialized = serializeAsJSON(elements, appState, files, "local");
+  const blob = new Blob([serialized], {
+    type: MIME_TYPES.excalidraw,
+  });
+
+  return ApiService.axios.post<{ statusCode: number }>("/draws", blob);
 };
 
 export const serializeAsJSON = (
@@ -95,12 +111,8 @@ export const loadFromJSON = async (
   localAppState: AppState,
   localElements: readonly ExcalidrawElement[] | null,
 ) => {
-  const file = await fileOpen({
-    description: "Excalidraw files",
-    // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
-    // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-    // extensions: ["json", "excalidraw", "png", "svg"],
-  });
+  const blobFile = await loadFromProvider();
+  const file = new File([blobFile], "opened.json");
   return loadFromBlob(
     await normalizeFile(file),
     localAppState,
