@@ -55,7 +55,7 @@ export const syncJSONWithProvider = async (
 
   return ApiService.axios.post<{ statusCode: number }>(
     "/draws/7687cc88-83bd-4eb0-91e7-64d4927f9575",
-    blob
+    blob,
   );
 };
 

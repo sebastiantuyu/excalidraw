@@ -150,7 +150,12 @@ export const actionSaveToActiveFile = register({
   perform: async (elements, appState, value, app) => {
     // const fileHandleExists = !!appState.fileHandle;
     // console.log("Save");
-    const { status } = await syncJSONWithProvider(elements, appState, app.files, app.getName());
+    const { status } = await syncJSONWithProvider(
+      elements,
+      appState,
+      app.files,
+      app.getName(),
+    );
 
     // try {
     //   const { fileHandle } = isImageFileHandle(appState.fileHandle)

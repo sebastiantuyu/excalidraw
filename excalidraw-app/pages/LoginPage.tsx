@@ -52,7 +52,16 @@ export const LoginPage = () => {
         fontSize: "0.96em",
       }}
     >
-      <form onSubmit={handleLogin} style={{ width: "350px", display: "flex",  flexDirection: "column", gap: 15, alignItems: "center" }}>
+      <form
+        onSubmit={handleLogin}
+        style={{
+          width: "350px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 15,
+          alignItems: "center",
+        }}
+      >
         <h2>Login to Excalidraw</h2>
         {invalid.length > 0 && (
           <div style={{ color: "red" }}>
@@ -61,7 +70,9 @@ export const LoginPage = () => {
             ))}
           </div>
         )}
-        <div style={{ display: "flex", flexDirection: "column", width: "inherit" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "inherit" }}
+        >
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -72,7 +83,9 @@ export const LoginPage = () => {
             style={{ fontFamily: "Assistant, sans-serif" }}
           />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", width: "inherit" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "inherit" }}
+        >
           <label htmlFor="password">Password</label>
           <input
             type={showPassword ? "text" : "password"}
@@ -87,10 +100,16 @@ export const LoginPage = () => {
               type="checkbox"
               onChange={() => setShowPassword(!showPassword)}
             />
-            <label htmlFor="showPassword" style={{ fontFamily: "Assistant, sans-serif" }}>Show Password</label>
+            <label
+              htmlFor="showPassword"
+              style={{ fontFamily: "Assistant, sans-serif" }}
+            >
+              Show Password
+            </label>
           </div>
         </div>
-        <button type="submit"
+        <button
+          type="submit"
           style={{
             fontFamily: "Assistant, sans-serif",
             margin: "1em",
@@ -99,13 +118,10 @@ export const LoginPage = () => {
             padding: "0.8em 1.5em",
             color: "white",
             borderRadius: 5,
-          }}>
-            {
-              loading
-              ? "..."
-              : "Login"
-            }
-          </button>
+          }}
+        >
+          {loading ? "..." : "Login"}
+        </button>
       </form>
     </div>
   );
