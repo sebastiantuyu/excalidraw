@@ -82,7 +82,7 @@ export const loadFromProvider = async () => {
   } = await ApiService.axios.get<{
     Item: { Id: string; Value: string };
   }>("/draws/7687cc88-83bd-4eb0-91e7-64d4927f9575");
-  return new Blob([Item.Value], { type: "application/json" });
+  return new Blob([JSON.parse(Item.Value)], { type: "application/json" });
 };
 
 export const fileSave = (

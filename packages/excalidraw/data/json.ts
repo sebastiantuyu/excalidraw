@@ -53,7 +53,10 @@ export const syncJSONWithProvider = async (
     type: MIME_TYPES.excalidraw,
   });
 
-  return ApiService.axios.post<{ statusCode: number }>("/draws", blob);
+  return ApiService.axios.post<{ statusCode: number }>(
+    "/draws/7687cc88-83bd-4eb0-91e7-64d4927f9575",
+    blob
+  );
 };
 
 export const serializeAsJSON = (

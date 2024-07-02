@@ -150,7 +150,7 @@ export const actionSaveToActiveFile = register({
   perform: async (elements, appState, value, app) => {
     // const fileHandleExists = !!appState.fileHandle;
     // console.log("Save");
-    await syncJSONWithProvider(elements, appState, app.files, app.getName());
+    const { status } = await syncJSONWithProvider(elements, appState, app.files, app.getName());
 
     // try {
     //   const { fileHandle } = isImageFileHandle(appState.fileHandle)
@@ -185,8 +185,17 @@ export const actionSaveToActiveFile = register({
     //   } else {
     //     console.warn(error);
     //   }
-    return { storeAction: StoreAction.NONE };
-    // }
+    return {
+      storeAction: StoreAction.NONE,
+      appState: {
+        ...appState,
+        toast: status === 200
+          ? {
+            message: t("toast.fileSaved")
+          }
+          : null
+      }
+    };
   },
   keyTest: (event) =>
     event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
@@ -210,7 +219,7 @@ export const actionSyncFileWithProvider = register({
       //   app.getName(),
       // );
 
-      const { data } = await syncJSONWithProvider(
+      const { status } = await syncJSONWithProvider(
         elements,
         {
           ...appState,
@@ -220,7 +229,7 @@ export const actionSyncFileWithProvider = register({
         app.getName(),
       );
 
-      if (data.statusCode !== 200) {
+      if (status !== 200) {
         throw Error("Error saving the file");
       }
 
@@ -234,6 +243,7 @@ export const actionSyncFileWithProvider = register({
         },
       };
     } catch (error: any) {
+      console.log(error);
       if (error?.name !== "AbortError") {
         console.error(error);
       } else {
